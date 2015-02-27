@@ -43,4 +43,7 @@ func TestASTNodeTagPrint(t *testing.T) {
 func TestASTNodeAdd(t *testing.T) {
 	a := &gopc.ASTNode{Type: "tag", TagName: "string"}
 	a.Add(&gopc.ASTNode{Type: "char", Pos: 0, Len: 1, Content: `"`})
+	if a.Length() != 1 {
+		t.Fatalf("add child failed")
+	}
 }

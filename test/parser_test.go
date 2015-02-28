@@ -47,3 +47,7 @@ func TestASTNodeAdd(t *testing.T) {
 		t.Fatalf("add child failed")
 	}
 }
+
+func TestASTNodeDelete(t *testing.T) {
+
+}

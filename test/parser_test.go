@@ -5,6 +5,34 @@ import (
 	"testing"
 )
 
+func TestNewASTNode(t *testing.T) {
+	n := gopc.NewASTNode()
+	if n.Length() != 0 {
+		t.Fatalf("creation failed")
+	}
+}
+
+func TestASTNodeAdd(t *testing.T) {
+	n := &gopc.ASTNode{Type: "tag", TagName: "string"}
+	n.Add(&gopc.ASTNode{Type: "char", Pos: 0, Len: 1, Content: `"`})
+	n.Add(&gopc.ASTNode{Type: "regex", Content: "hello, world!"})
+	n.Add(&gopc.ASTNode{Type: "char", Pos: 14, Len: 1, Content: `"`})
+	if n.Length() != 3 {
+		t.Fatalf("add child failed")
+	}
+	expected := `string
+  char:1:0 '"'
+  regex 'hello, world!'
+  char:1:14 '"'`
+	if n.String() != expected {
+		t.Fatalf("add child, got `%s`, expected `%s`", n, expected)
+	}
+}
+
+func TestASTNodeDelete(t *testing.T) {
+
+}
+
 func TestASTNodeRegexPrint(t *testing.T) {
 	n := &gopc.ASTNode{Type: "regex", Len: 0, Pos: 0}
 	expected := "regex"
@@ -38,16 +66,4 @@ func TestASTNodeTagPrint(t *testing.T) {
 	if n.String() != expected {
 		t.Fatalf("char node string format, got `%s`, expected `%s`", n, expected)
 	}
-}
-
-func TestASTNodeAdd(t *testing.T) {
-	a := &gopc.ASTNode{Type: "tag", TagName: "string"}
-	a.Add(&gopc.ASTNode{Type: "char", Pos: 0, Len: 1, Content: `"`})
-	if a.Length() != 1 {
-		t.Fatalf("add child failed")
-	}
-}
-
-func TestASTNodeDelete(t *testing.T) {
-
 }

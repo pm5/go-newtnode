@@ -13,6 +13,12 @@ type ASTNode struct {
 	Children []*ASTNode
 }
 
+func NewASTNode() *ASTNode {
+	n := &ASTNode{}
+	n.Children = make([]*ASTNode, 0)
+	return n
+}
+
 func (a *ASTNode) String() (out string) {
 	switch a.Type {
 	case "regex":
@@ -36,4 +42,9 @@ func (a *ASTNode) String() (out string) {
 }
 
 func (a *ASTNode) Add(c *ASTNode) {
+	a.Children = append(a.Children, c)
+}
+
+func (a *ASTNode) Length() int {
+	return len(a.Children)
 }

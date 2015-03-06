@@ -4,22 +4,30 @@ import (
 	"fmt"
 )
 
-type ASTNode struct {
+type Node struct {
 	Type     string // "regex", "char", "tag"
 	Len      int
 	Pos      int
 	TagName  string
 	Content  string
-	Children []*ASTNode
+	Children []*Node
 }
 
-func NewASTNode() *ASTNode {
-	n := &ASTNode{}
-	n.Children = make([]*ASTNode, 0)
+func NewNodeTag(name string) *Node {
+	n := &Node{Type: "tag", TagName: name}
+	n.Children = make([]*Node, 0)
 	return n
 }
 
-func (a *ASTNode) String() (out string) {
+func NewNodeRegex(content string) *Node {
+	return &Node{Type: "regex", Content: content}
+}
+
+func NewNodeChar(content string, length int, position int) *Node {
+	return &Node{Type: "char", Len: length, Pos: position, Content: content}
+}
+
+func (a *Node) String() (out string) {
 	switch a.Type {
 	case "regex":
 		out = fmt.Sprintf("%s", a.Type)
@@ -41,10 +49,14 @@ func (a *ASTNode) String() (out string) {
 	return
 }
 
-func (a *ASTNode) Add(c *ASTNode) {
+func (a *Node) Add(c *Node) {
 	a.Children = append(a.Children, c)
 }
 
-func (a *ASTNode) Length() int {
+func (a *Node) Delete(i int) {
+	a.Children = append(a.Children[:i], a.Children[i+1:len(a.Children)]...)
+}
+
+func (a *Node) Length() int {
 	return len(a.Children)
 }

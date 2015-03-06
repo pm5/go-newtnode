@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewNodeTag(t *testing.T) {
-	n := newtnode.NewNodeTag("string")
+	n := spc.NewNodeTag("string")
 	if n.Type != "tag" {
 		t.Fatalf("Tag node creation failed")
 	}
@@ -16,14 +16,14 @@ func TestNewNodeTag(t *testing.T) {
 }
 
 func TestNewNodeRegex(t *testing.T) {
-	n := newtnode.NewNodeRegex("cons")
+	n := spc.NewNodeRegex("cons")
 	if n.Type != "regex" {
 		t.Fatalf("Regex node creation failed")
 	}
 }
 
 func TestNewNodeChar(t *testing.T) {
-	n := newtnode.NewNodeChar(`"`, 1, 13)
+	n := spc.NewNodeChar(`"`, 1, 13)
 	if n.Type != "char" {
 		t.Fatalf("Regex node creation failed")
 	}
@@ -36,10 +36,10 @@ func TestNewNodeChar(t *testing.T) {
 }
 
 func TestNodeAdd(t *testing.T) {
-	n := newtnode.NewNodeTag("string")
-	n.Add(newtnode.NewNodeChar(`"`, 1, 0))
-	n.Add(newtnode.NewNodeRegex("hello, world!"))
-	n.Add(newtnode.NewNodeChar(`"`, 1, 14))
+	n := spc.NewNodeTag("string")
+	n.Add(spc.NewNodeChar(`"`, 1, 0))
+	n.Add(spc.NewNodeRegex("hello, world!"))
+	n.Add(spc.NewNodeChar(`"`, 1, 14))
 	if n.Length() != 3 {
 		t.Fatalf("add child failed")
 	}
@@ -53,10 +53,10 @@ func TestNodeAdd(t *testing.T) {
 }
 
 func TestNodeDelete(t *testing.T) {
-	n := newtnode.NewNodeTag("string")
-	n.Add(newtnode.NewNodeChar(`"`, 1, 0))
-	n.Add(newtnode.NewNodeRegex("foobar"))
-	n.Add(newtnode.NewNodeChar(`"`, 1, 7))
+	n := spc.NewNodeTag("string")
+	n.Add(spc.NewNodeChar(`"`, 1, 0))
+	n.Add(spc.NewNodeRegex("foobar"))
+	n.Add(spc.NewNodeChar(`"`, 1, 7))
 	n.Delete(1)
 	expected := `string
   char:1:0 '"'
@@ -70,7 +70,7 @@ func TestNodeDelete(t *testing.T) {
 }
 
 func TestNodeRegexString(t *testing.T) {
-	n := newtnode.NewNodeRegex("")
+	n := spc.NewNodeRegex("")
 	expected := "regex"
 	if n.String() != expected {
 		t.Fatalf("regex node string format, got `%s`, expected `%s`", n, expected)
@@ -78,7 +78,7 @@ func TestNodeRegexString(t *testing.T) {
 }
 
 func TestNodeCharString(t *testing.T) {
-	n := newtnode.NewNodeChar("c", 1, 13)
+	n := spc.NewNodeChar("c", 1, 13)
 	expected := "char:1:13 'c'"
 	if n.String() != expected {
 		t.Fatalf("char node string format, got `%s`, expected `%s`", n, expected)

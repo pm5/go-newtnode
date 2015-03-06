@@ -1,4 +1,4 @@
-package newtnode
+package spc
 
 type Parser struct {
 	Type    string

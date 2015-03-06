@@ -6,14 +6,14 @@ import (
 )
 
 func TestNewParserChar(t *testing.T) {
-	p := newtnode.NewParserChar(`"`)
+	p := spc.NewParserChar(`"`)
 	if p == nil {
 		t.Fatalf("Parser creation failed")
 	}
 }
 
 func TestNewParserCharParse(t *testing.T) {
-	p := newtnode.NewParserChar(`"`)
+	p := spc.NewParserChar(`"`)
 	n, err := p.Parse(`"`)
 	if n == nil || err != nil {
 		t.Fatalf("Parser char parse failed")

@@ -1,8 +1,8 @@
 
-newtnode
-========
+go-spc
+======
 
-Another parser combinator in Go.  It is a work-in-progress.
+A simple parser combinator in Go.  It is a work-in-progress.
 
 License
 -------

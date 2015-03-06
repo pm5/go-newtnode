@@ -1,4 +1,4 @@
-package newtnode
+package spc
 
 import (
 	"fmt"

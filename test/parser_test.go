@@ -53,3 +53,35 @@ func TestParserRegexpParse(t *testing.T) {
 		t.Fatalf("Parser regexp parse failed. Expected `%s`, got `%s`", expected, n.Content)
 	}
 }
+
+func TestNewParserTag(t *testing.T) {
+	p := spc.NewParserTag("string",
+		spc.NewParserChar(`"`),
+		spc.NewParserRegexp(`[a-zA-Z\s\.]*`),
+		spc.NewParserChar(`"`),
+	)
+	if p == nil {
+		t.Fatalf("Parser tag creation failed")
+	}
+}
+
+func TestParserTagParse(t *testing.T) {
+	p := spc.NewParserTag("string",
+		spc.NewParserChar(`"`),
+		spc.NewParserRegexp(`[a-zA-Z\s\.!?]*`),
+		spc.NewParserChar(`"`),
+	)
+	n, err := p.Parse("hello, world!")
+	if err != nil || n == nil {
+		t.Fatalf("Parser tag parse failed: %s", err)
+	}
+	if n.Type != "tag" {
+		t.Fatalf("Parser tag parse failed. Expected `tag`, got `%s`", n.Type)
+	}
+	if n.Length() != 3 {
+		t.Fatalf("Parser tag parse failed. Expected 3, got %d", n.Length())
+	}
+	if n.Children[1].Content != "hello, world!" {
+		t.Fatalf("Parser tag parse failed. Expected `hello, world!`, got `%s`", n.Children[1].Content)
+	}
+}

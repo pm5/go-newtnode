@@ -6,9 +6,11 @@ import (
 )
 
 type Parser struct {
-	Type    string
-	Content string
-	Pattern *regexp.Regexp
+	Type     string
+	Content  string
+	Pattern  *regexp.Regexp
+	Name     string
+	Children []*Parser
 }
 
 func NewParserChar(content string) *Parser {
@@ -17,6 +19,10 @@ func NewParserChar(content string) *Parser {
 
 func NewParserRegexp(pattern string) *Parser {
 	return &Parser{Type: "regexp", Pattern: regexp.MustCompile(pattern)}
+}
+
+func NewParserTag(name string, children ...*Parser) *Parser {
+	return &Parser{Type: "tag", Name: name, Children: children}
 }
 
 func (p *Parser) Parse(content string) (*Node, error) {
@@ -31,6 +37,9 @@ func (p *Parser) Parse(content string) (*Node, error) {
 			return nil, errors.New("Parsing failed")
 		}
 		return NewNodeRegexp(content[r[0]:r[1]]), nil
+	case "tag":
+		n := NewNodeTag(p.Name)
+		return n, nil
 	}
 	return nil, nil
 }

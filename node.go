@@ -5,7 +5,7 @@ import (
 )
 
 type Node struct {
-	Type     string // "regex", "char", "tag"
+	Type     string // "regexp", "char", "tag"
 	Len      int
 	Pos      int
 	TagName  string
@@ -19,8 +19,8 @@ func NewNodeTag(name string) *Node {
 	return n
 }
 
-func NewNodeRegex(content string) *Node {
-	return &Node{Type: "regex", Content: content}
+func NewNodeRegexp(content string) *Node {
+	return &Node{Type: "regexp", Content: content}
 }
 
 func NewNodeChar(content string, length int, position int) *Node {
@@ -29,7 +29,7 @@ func NewNodeChar(content string, length int, position int) *Node {
 
 func (a *Node) String() (out string) {
 	switch a.Type {
-	case "regex":
+	case "regexp":
 		out = fmt.Sprintf("%s", a.Type)
 		if len(a.Content) > 0 {
 			out += fmt.Sprintf(" '%s'", a.Content)

@@ -39,6 +39,15 @@ func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 		return NewNodeRegexp(content[r[0]:r[1]]), nil
 	case "tag":
 		n := NewNodeTag(p.Name)
+		i := index
+		for _, parser := range p.Children {
+			child, err := parser.Parse(content, i)
+			if err != nil {
+				return nil, err
+			}
+			n.Add(child)
+			//i += child.Length
+		}
 		return n, nil
 	}
 	return nil, nil

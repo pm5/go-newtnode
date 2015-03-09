@@ -25,21 +25,21 @@ func NewParserTag(name string, children ...*Parser) *Parser {
 	return &Parser{Type: "tag", Name: name, Children: children}
 }
 
-func (p *Parser) Parse(content string) (node *Node, leftover string, err error) {
+func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 	switch p.Type {
 	case "char":
-		if content == p.Content {
-			return NewNodeChar(content, len(content), 0), "", nil
+		if content[index] == p.Content[0] {
+			return NewNodeChar(p.Content, len(p.Content), 0), nil
 		}
 	case "regexp":
 		r := p.Pattern.FindStringIndex(content)
 		if r == nil {
-			return nil, "", errors.New("Parsing failed")
+			return nil, errors.New("Parsing failed")
 		}
-		return NewNodeRegexp(content[r[0]:r[1]]), "", nil
+		return NewNodeRegexp(content[r[0]:r[1]]), nil
 	case "tag":
 		n := NewNodeTag(p.Name)
-		return n, "", nil
+		return n, nil
 	}
-	return nil, "", nil
+	return nil, nil
 }

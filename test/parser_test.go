@@ -14,7 +14,7 @@ func TestNewParserChar(t *testing.T) {
 
 func TestParserCharParse(t *testing.T) {
 	p := spc.NewParserChar(`"`)
-	n, left, err := p.Parse(`"`)
+	n, err := p.Parse(`"hello"`, 0)
 	if n == nil || err != nil {
 		t.Fatalf("Parser char parse failed")
 	}
@@ -30,9 +30,6 @@ func TestParserCharParse(t *testing.T) {
 	if n.Pos != 0 {
 		t.Fatalf("Parser char parse failed. Expected `1`, got `%d`", n.Pos)
 	}
-	if left != "" {
-		t.Fatalf("Parser char parse failed. Expected ``, got `%s`", left)
-	}
 }
 
 func TestNewParserRegexp(t *testing.T) {
@@ -44,8 +41,8 @@ func TestNewParserRegexp(t *testing.T) {
 
 func TestParserRegexpParse(t *testing.T) {
 	p := spc.NewParserRegexp(`[a-zA-Z\s]*`)
-	expected := `just what do you think youre doing dave`
-	n, _, err := p.Parse(expected)
+	expected := `just what do you think youre doing`
+	n, err := p.Parse(expected+`, dave?`, 0)
 	if err != nil || n == nil {
 		t.Fatalf("Parser regexp parse failed")
 	}
@@ -74,7 +71,7 @@ func TestParserTagParse(t *testing.T) {
 		spc.NewParserRegexp(`[a-zA-Z\s\.!?]*`),
 		spc.NewParserChar(`"`),
 	)
-	n, _, err := p.Parse("hello, world!")
+	n, err := p.Parse("hello, world!", 0)
 	if err != nil || n == nil {
 		t.Fatalf("Parser tag parse failed: %s", err)
 	}

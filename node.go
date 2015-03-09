@@ -22,7 +22,7 @@ func NewNodeRegexp(content string) *Node {
 	return &Node{Type: "regexp", Content: content}
 }
 
-func NewNodeChar(content string, length int, position int) *Node {
+func NewNodeChar(content string, position int) *Node {
 	return &Node{Type: "char", Pos: position, Content: content}
 }
 
@@ -35,7 +35,7 @@ func (a *Node) String() (out string) {
 		}
 		break
 	case "char":
-		out = fmt.Sprintf("%s:%d:%d '%s'", a.Type, a.GetLen(), a.Pos, a.Content)
+		out = fmt.Sprintf("%s:%d:%d '%s'", a.Type, a.Len(), a.Pos, a.Content)
 		break
 	case "tag":
 		out = fmt.Sprintf("%s", a.TagName)
@@ -60,13 +60,13 @@ func (a *Node) Length() int {
 	return len(a.Children)
 }
 
-func (n *Node) GetLen() int {
+func (n *Node) Len() int {
 	if n.Type == "char" || n.Type == "regexp" {
 		return len(n.Content)
 	}
 	var sum int
 	for _, childNode := range n.Children {
-		sum += childNode.GetLen()
+		sum += childNode.Len()
 	}
 	return sum
 }

@@ -15,31 +15,24 @@ func TestNewNodeTag(t *testing.T) {
 	}
 }
 
-func TestGetLen(t *testing.T) {
+func TestLen(t *testing.T) {
 	var n *spc.Node
 
-	n = spc.NewNodeChar("c", 1, 0)
-	if n.GetLen() != 1 {
-		t.Fatalf("Length of character node wrong. Expected 1, got %d", n.GetLen())
+	n = spc.NewNodeChar("c", 0)
+	if n.Len() != 1 {
+		t.Fatalf("Length of character node wrong. Expected 1, got %d", n.Len())
 	}
 
 	n = spc.NewNodeRegexp("hello")
-	if n.GetLen() != 5 {
-		t.Fatalf("Length of regexp node wrong. Expected 5, got %d", n.GetLen())
+	if n.Len() != 5 {
+		t.Fatalf("Length of regexp node wrong. Expected 5, got %d", n.Len())
 	}
 
 	n = spc.NewNodeTag("string")
-	n.Add(spc.NewNodeChar(`"`, 1, 0))
+	n.Add(spc.NewNodeChar(`"`, 0))
 	n.Add(spc.NewNodeRegexp("hello"))
-	n.Add(spc.NewNodeChar(`"`, 1, 5))
-	if n.GetLen() != 7 {
-		t.Fatalf("Length of tag node wrong. Expected 7, got %d", n.GetLen())
+	n.Add(spc.NewNodeChar(`"`, 5))
+	if n.Len() != 7 {
+		t.Fatalf("Length of tag node wrong. Expected 7, got %d", n.Len())
 	}
 }
-
-//func TestLengthChar(t *testing.T) {
-//n := spc.NewNodeChar(".", 1, 0)
-//if n.Length() != 1 {
-//t.Fatalf("Node length wrong. Expected 1, got %d", n.Length())
-//}
-//}

@@ -2,6 +2,7 @@ package spc
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 )
 
@@ -29,12 +30,13 @@ func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 	switch p.Type {
 	case "char":
 		if content[index] == p.Content[0] {
-			return NewNodeChar(p.Content, len(p.Content), 0), nil
+			return NewNodeChar(p.Content, index), nil
 		}
+		return nil, errors.New(fmt.Sprintf("Parser `%c` at index %d got `%c`.", p.Content[0], index, content[index]))
 	case "regexp":
 		r := p.Pattern.FindStringIndex(content)
 		if r == nil {
-			return nil, errors.New("Parsing failed")
+			return nil, errors.New(fmt.Sprintf("Parser `%s` at index %d does not match.", p.Pattern, index))
 		}
 		return NewNodeRegexp(content[r[0]:r[1]]), nil
 	case "tag":
@@ -46,7 +48,7 @@ func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 				return nil, err
 			}
 			n.Add(child)
-			//i += child.Length
+			i += child.Len()
 		}
 		return n, nil
 	}

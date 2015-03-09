@@ -13,21 +13,24 @@ func TestNewParserChar(t *testing.T) {
 }
 
 func TestParserCharParse(t *testing.T) {
-	p := spc.NewParserChar(`"`)
-	n, err := p.Parse(`"hello"`, 0)
-	if n == nil || err != nil {
-		t.Fatalf("Parser char parse failed")
+	p := spc.NewParserChar(`o`)
+	n, err := p.Parse(`"hello"`, 5)
+	if err != nil {
+		t.Fatalf("Parse char failed: %s", err)
+	}
+	if n == nil {
+		t.Fatalf("Parse char failed. Expected `o`, got nil.")
 	}
 	if n.Type != "char" {
 		t.Fatalf("Parser char parse failed. Expected `char`, got `%s`", n.Type)
 	}
-	if n.Content != `"` {
+	if n.Content != `o` {
 		t.Fatalf("Parser char parse failed. Expected `\"`, got `%s`", n.Content)
 	}
-	if n.GetLen() != 1 {
-		t.Fatalf("Parser char parse failed. Expected `1`, got `%d`", n.GetLen())
+	if n.Len() != 1 {
+		t.Fatalf("Parser char parse failed. Expected `1`, got `%d`", n.Len())
 	}
-	if n.Pos != 0 {
+	if n.Pos != 5 {
 		t.Fatalf("Parser char parse failed. Expected `1`, got `%d`", n.Pos)
 	}
 }
@@ -57,7 +60,7 @@ func TestParserRegexpParse(t *testing.T) {
 func TestNewParserTag(t *testing.T) {
 	p := spc.NewParserTag("string",
 		spc.NewParserChar(`"`),
-		spc.NewParserRegexp(`[a-zA-Z\s\.]*`),
+		spc.NewParserRegexp(`[a-zA-Z\s\.]+`),
 		spc.NewParserChar(`"`),
 	)
 	if p == nil {
@@ -68,11 +71,11 @@ func TestNewParserTag(t *testing.T) {
 func TestParserTagParse(t *testing.T) {
 	p := spc.NewParserTag("string",
 		spc.NewParserChar(`"`),
-		spc.NewParserRegexp(`[a-zA-Z\s\.!?]*`),
+		spc.NewParserRegexp(`[a-zA-Z\s\.,!?]+`),
 		spc.NewParserChar(`"`),
 	)
-	n, err := p.Parse("hello, world!", 0)
-	if err != nil || n == nil {
+	n, err := p.Parse("\"hello, world!\"", 0)
+	if err != nil {
 		t.Fatalf("Parser tag parse failed: %s", err)
 	}
 	if n.Type != "tag" {
@@ -81,7 +84,7 @@ func TestParserTagParse(t *testing.T) {
 	if n.Length() != 3 {
 		t.Fatalf("Parser tag parse failed. Expected 3, got %d", n.Length())
 	}
-	//if n.Children[1].Content != "hello, world!" {
-	//t.Fatalf("Parser tag parse failed. Expected `hello, world!`, got `%s`", n.Children[1].Content)
-	//}
+	if n.Children[1].Content != "hello, world!" {
+		t.Fatalf("Parser tag parse failed. Expected `hello, world!`, got `%s`", n.Children[1].Content)
+	}
 }

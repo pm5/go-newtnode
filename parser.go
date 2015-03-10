@@ -35,6 +35,13 @@ func NewParserTag(name string, children ...*Parser) *Parser {
 	return &p
 }
 
+func NewParserOr(a, b *Parser) *Parser {
+	p := Parser{Type: "or"}
+	p.Add(a, false)
+	p.Add(b, false)
+	return &p
+}
+
 func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 	if index > len(content) {
 		return nil, errors.New("Index exceeds parsed string length")
@@ -72,12 +79,22 @@ func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 			}
 		}
 		return n, nil
+	case "or":
+		n, err := p.Children[0].Parser.Parse(content, index)
+		if err == nil {
+			return n, nil
+		}
+		n, err = p.Children[1].Parser.Parse(content, index)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	}
-	return nil, nil
+	return nil, errors.New(fmt.Sprintf("Unknown parser type `%s`.", p.Type))
 }
 
 func (p *Parser) Add(child *Parser, indefinite bool) error {
-	if p.Type != "tag" {
+	if p.Type != "tag" && p.Type != "or" {
 		return errors.New(fmt.Sprintf("Wrong type for Add(). Expected `tag`, got `%s`", p.Type))
 	}
 	p.Children = append(p.Children, &IndefiniteParser{Parser: child, Indefinite: indefinite})

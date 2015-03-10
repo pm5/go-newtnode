@@ -99,6 +99,29 @@ func TestTagAdd(t *testing.T) {
 		t.Fatalf("Parser add failed: %s", err)
 	}
 	if n.Len() != 31 {
-		t.Fatalf("Parse sentence faild. Expected 31, got %d.", n.Len())
+		t.Fatalf("Parse sentence failed. Expected 31, got %d.", n.Len())
+	}
+}
+
+func TestNewParserOr(t *testing.T) {
+	p := spc.NewParserOr(
+		spc.NewParserChar(`+`),
+		spc.NewParserChar(`-`),
+	)
+	var n *spc.Node
+	var err error
+	n, err = p.Parse("+13", 0)
+	if err != nil {
+		t.Fatalf("OR parse failed: %s", err)
+	}
+	if n.Content != "+" {
+		t.Fatalf("OR parse failed. Expected `+`, got `%s`.", n.Content)
+	}
+	n, err = p.Parse("-200", 0)
+	if err != nil {
+		t.Fatalf("OR parse failed: %s", err)
+	}
+	if n.Content != "-" {
+		t.Fatalf("OR parse failed. Expected `-`, got `%s`.", n.Content)
 	}
 }

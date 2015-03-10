@@ -125,3 +125,45 @@ func TestNewParserOr(t *testing.T) {
 		t.Fatalf("OR parse failed. Expected `-`, got `%s`.", n.Content)
 	}
 }
+
+func TestParseMath(t *testing.T) {
+	expression := spc.NewParserTag("expression")
+	product := spc.NewParserTag("product")
+	value := spc.NewParserTag("value")
+	value.Add(spc.NewParserOr(
+		spc.NewParserRegexp(`[0-9]+`),
+		spc.NewParserTag("parenthesized-expression",
+			spc.NewParserChar(`(`),
+			expression,
+			spc.NewParserChar(`)`),
+		),
+	), false)
+	product.Add(value, false)
+	product.Add(spc.NewParserTag("sub-product",
+		spc.NewParserOr(
+			spc.NewParserChar(`*`),
+			spc.NewParserChar(`/`),
+		),
+		value,
+	), true)
+	expression.Add(product, false)
+	expression.Add(spc.NewParserTag("sub-expression",
+		spc.NewParserOr(
+			spc.NewParserChar(`+`),
+			spc.NewParserChar(`-`),
+		),
+		product,
+	), true)
+	maths := spc.NewParserTag("maths",
+		spc.NewParserRegexp(`^`),
+		expression,
+		spc.NewParserRegexp(`$`),
+	)
+	n, err := maths.Parse("(4*2*11+2)-5", 0)
+	if err != nil {
+		t.Fatalf("Math parsed failed: %s", err)
+	}
+	if n.Len() != 12 {
+		t.Fatalf("Math parsed failed. Expected `(4*2*11+2)-5`, got `%s`.", n)
+	}
+}

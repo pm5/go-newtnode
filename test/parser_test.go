@@ -12,7 +12,7 @@ func TestNewParserChar(t *testing.T) {
 	}
 }
 
-func TestParserCharParse(t *testing.T) {
+func TestCharParse(t *testing.T) {
 	p := spc.NewParserChar(`o`)
 	n, err := p.Parse(`"hello"`, 5)
 	if err != nil {
@@ -42,7 +42,7 @@ func TestNewParserRegexp(t *testing.T) {
 	}
 }
 
-func TestParserRegexpParse(t *testing.T) {
+func TestRegexpParse(t *testing.T) {
 	p := spc.NewParserRegexp(`[a-zA-Z\s]*`)
 	expected := `just what do you think youre doing`
 	n, err := p.Parse(expected+`, dave?`, 0)
@@ -68,7 +68,7 @@ func TestNewParserTag(t *testing.T) {
 	}
 }
 
-func TestParserTagParse(t *testing.T) {
+func TestTagParse(t *testing.T) {
 	p := spc.NewParserTag("string",
 		spc.NewParserChar(`"`),
 		spc.NewParserRegexp(`[a-zA-Z\s\.,!?]+`),

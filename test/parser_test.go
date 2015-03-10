@@ -88,3 +88,17 @@ func TestTagParse(t *testing.T) {
 		t.Fatalf("Parser tag parse failed. Expected `hello, world!`, got `%s`", n.Children[1].Content)
 	}
 }
+
+func TestTagAdd(t *testing.T) {
+	w := spc.NewParserRegexp(`[a-zA-Z]+`)
+	s := spc.NewParserTag("sentence")
+	s.Add(w, true)
+	s.Add(spc.NewParserRegexp(`[\.!?]`), false)
+	n, err := s.Parse("Do you like green eggs and ham?", 0)
+	if err != nil {
+		t.Fatalf("Parser add failed: %s", err)
+	}
+	if n.Len() != 31 {
+		t.Fatalf("Parse sentence faild. Expected 31, got %d.", n.Len())
+	}
+}

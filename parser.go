@@ -6,12 +6,17 @@ import (
 	"regexp"
 )
 
+type IndefiniteParser struct {
+	Parser     *Parser
+	Indefinite bool
+}
+
 type Parser struct {
 	Type     string
 	Content  string
 	Pattern  *regexp.Regexp
 	Name     string
-	Children []*Parser
+	Children []*IndefiniteParser
 }
 
 func NewParserChar(content string) *Parser {
@@ -23,10 +28,17 @@ func NewParserRegexp(pattern string) *Parser {
 }
 
 func NewParserTag(name string, children ...*Parser) *Parser {
-	return &Parser{Type: "tag", Name: name, Children: children}
+	p := Parser{Type: "tag", Name: name}
+	for _, child := range children {
+		p.Add(child, false)
+	}
+	return &p
 }
 
 func (p *Parser) Parse(content string, index int) (node *Node, err error) {
+	if index > len(content) {
+		return nil, errors.New("Index exceeds parsed string length")
+	}
 	switch p.Type {
 	case "char":
 		if content[index] == p.Content[0] {
@@ -34,23 +46,40 @@ func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 		}
 		return nil, errors.New(fmt.Sprintf("Parser `%c` at index %d got `%c`.", p.Content[0], index, content[index]))
 	case "regexp":
-		r := p.Pattern.FindStringIndex(content)
+		r := p.Pattern.FindStringIndex(content[index:])
 		if r == nil {
 			return nil, errors.New(fmt.Sprintf("Parser `%s` at index %d does not match.", p.Pattern, index))
 		}
-		return NewNodeRegexp(content[r[0]:r[1]]), nil
+		return NewNodeRegexp(content[index+r[0] : index+r[1]]), nil
 	case "tag":
 		n := NewNodeTag(p.Name)
 		i := index
-		for _, parser := range p.Children {
-			child, err := parser.Parse(content, i)
-			if err != nil {
-				return nil, err
+		for _, child := range p.Children {
+			if child.Indefinite {
+				childNode, err := child.Parser.Parse(content, i)
+				for err == nil {
+					n.Add(childNode)
+					i += childNode.Len()
+					childNode, err = child.Parser.Parse(content, i)
+				}
+			} else {
+				childNode, err := child.Parser.Parse(content, i)
+				if err != nil {
+					return nil, err
+				}
+				n.Add(childNode)
+				i += childNode.Len()
 			}
-			n.Add(child)
-			i += child.Len()
 		}
 		return n, nil
 	}
 	return nil, nil
+}
+
+func (p *Parser) Add(child *Parser, indefinite bool) error {
+	if p.Type != "tag" {
+		return errors.New(fmt.Sprintf("Wrong type for Add(). Expected `tag`, got `%s`", p.Type))
+	}
+	p.Children = append(p.Children, &IndefiniteParser{Parser: child, Indefinite: indefinite})
+	return nil
 }

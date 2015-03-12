@@ -27,21 +27,25 @@ func NewNodeChar(content string, position int) *Node {
 }
 
 func (a *Node) String() (out string) {
+	return a.prefixedString("")
+}
+
+func (a *Node) prefixedString(prefix string) (out string) {
 	switch a.Type {
 	case "regexp":
-		out = fmt.Sprintf("%s", a.Type)
+		out = fmt.Sprintf(prefix+"%s", a.Type)
 		if len(a.Content) > 0 {
 			out += fmt.Sprintf(" '%s'", a.Content)
 		}
 		break
 	case "char":
-		out = fmt.Sprintf("%s:%d:%d '%s'", a.Type, a.Len(), a.Pos, a.Content)
+		out = fmt.Sprintf(prefix+"%s:%d:%d '%s'", a.Type, a.Len(), a.Pos, a.Content)
 		break
 	case "tag":
-		out = fmt.Sprintf("%s", a.TagName)
-		for _, c := range a.Children {
-			out += "\n  "
-			out += fmt.Sprintf("%s", c)
+		out = fmt.Sprintf(prefix+"%s", a.TagName)
+		for _, child := range a.Children {
+			out += "\n"
+			out += fmt.Sprintf("%s", child.prefixedString(prefix+"  "))
 		}
 		break
 	}

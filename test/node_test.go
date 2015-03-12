@@ -36,3 +36,12 @@ func TestLen(t *testing.T) {
 		t.Fatalf("Length of tag node wrong. Expected 7, got %d", n.Len())
 	}
 }
+
+func TestString(t *testing.T) {
+	n := spc.NewNodeTag("string")
+	n.Add(spc.NewNodeChar("a", 0))
+	if n.String() != `string
+  char:1:0 'a'` {
+		t.Fatalf("Tag to string failed. got `%s`.", n.String())
+	}
+}

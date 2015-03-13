@@ -61,7 +61,7 @@ func NewParserOr(a, b *Parser) *Parser {
 
 func (p *Parser) Parse(content string, index int) (node *Node, err error) {
 	d("Parse `%s` with %s at %d", content, p, index)
-	if index >= len(content) {
+	if (p.Type == "char" && index >= len(content)) || index > len(content) {
 		return nil, errors.New(fmt.Sprintf("Index exceeds parsed string length %d.", len(content)))
 	}
 	switch p.Type {

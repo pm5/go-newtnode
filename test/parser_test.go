@@ -5,6 +5,35 @@ import (
 	"testing"
 )
 
+func TestParserString(t *testing.T) {
+	var p *spc.Parser
+	var expected string
+
+	p = spc.NewParserChar(".")
+	expected = "char `.`"
+	if p.String() != expected {
+		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
+	}
+
+	p = spc.NewParserRegexp(`[0-9]+`)
+	expected = "regexp `[0-9]+`"
+	if p.String() != expected {
+		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
+	}
+
+	p = spc.NewParserTag("number")
+	expected = "tag `number`"
+	if p.String() != expected {
+		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
+	}
+
+	p = spc.NewParserOr(spc.NewParserChar("+"), spc.NewParserChar("-"))
+	expected = "or"
+	if p.String() != expected {
+		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
+	}
+}
+
 func TestNewParserChar(t *testing.T) {
 	p := spc.NewParserChar(`"`)
 	if p == nil {
@@ -126,17 +155,26 @@ func TestNewParserOr(t *testing.T) {
 	}
 }
 
+/**
+ * Test the following language
+ *
+ * 	expression : <product> (('+' | '-') <product>)*;
+ * 	product    : <value>   (('*' | '/')   <value>)*;
+ * 	value      : /[0-9]+/ | '(' <expression> ')';
+ * 	maths      : /^/ <expression> /$/;
+ *
+ */
 func TestParseMath(t *testing.T) {
 	expression := spc.NewParserTag("expression")
 	product := spc.NewParserTag("product")
 	value := spc.NewParserTag("value")
 	value.Add(spc.NewParserOr(
-		spc.NewParserRegexp(`[0-9]+`),
 		spc.NewParserTag("parenthesized-expression",
 			spc.NewParserChar(`(`),
 			expression,
 			spc.NewParserChar(`)`),
 		),
+		spc.NewParserRegexp(`[0-9]+`),
 	), false)
 	product.Add(value, false)
 	product.Add(spc.NewParserTag("sub-product",

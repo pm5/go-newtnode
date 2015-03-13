@@ -3,8 +3,11 @@ package spc
 import (
 	"errors"
 	"fmt"
+	"github.com/tj/go-debug"
 	"regexp"
 )
+
+var d = debug.Debug("spc:parser")
 
 type IndefiniteParser struct {
 	Parser     *Parser
@@ -35,6 +38,20 @@ func NewParserTag(name string, children ...*Parser) *Parser {
 	return &p
 }
 
+func (p *Parser) String() string {
+	switch p.Type {
+	case "char":
+		return "char `" + p.Content + "`"
+	case "regexp":
+		return "regexp `" + p.Pattern.String() + "`"
+	case "tag":
+		return "tag `" + p.Name + "`"
+	case "or":
+		return "or"
+	}
+	return ""
+}
+
 func NewParserOr(a, b *Parser) *Parser {
 	p := Parser{Type: "or"}
 	p.Add(a, false)
@@ -43,8 +60,9 @@ func NewParserOr(a, b *Parser) *Parser {
 }
 
 func (p *Parser) Parse(content string, index int) (node *Node, err error) {
-	if index > len(content) {
-		return nil, errors.New("Index exceeds parsed string length")
+	d("Parse `%s` with %s at %d", content, p, index)
+	if index >= len(content) {
+		return nil, errors.New(fmt.Sprintf("Index exceeds parsed string length %d.", len(content)))
 	}
 	switch p.Type {
 	case "char":

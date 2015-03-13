@@ -40,8 +40,10 @@ func TestLen(t *testing.T) {
 func TestString(t *testing.T) {
 	n := spc.NewNodeTag("string")
 	n.Add(spc.NewNodeChar("a", 0))
+	n.Add(spc.NewNodeRegexp("hello"))
 	if n.String() != `string
-  char:1:0 'a'` {
+  char:1:0 'a'
+  regexp 'hello'` {
 		t.Fatalf("Tag to string failed. got `%s`.", n.String())
 	}
 }

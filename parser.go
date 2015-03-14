@@ -42,7 +42,7 @@ func NewParserChar(content string) *CharParser {
 }
 
 func NewParserRegexp(pattern string) *RegexpParser {
-	return &RegexpParser{Pattern: regexp.MustCompile(pattern)}
+	return &RegexpParser{Pattern: regexp.MustCompile("^" + pattern)}
 }
 
 func NewParserTag(name string, children ...Parser) *TagParser {
@@ -62,7 +62,7 @@ func (p CharParser) String() string {
 }
 
 func (p RegexpParser) String() string {
-	return "regexp `" + p.Pattern.String() + "`"
+	return "regexp `" + p.Pattern.String()[1:] + "`"
 }
 
 func (p TagParser) String() string {

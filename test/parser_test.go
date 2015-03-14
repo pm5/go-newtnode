@@ -86,6 +86,15 @@ func TestRegexpParse(t *testing.T) {
 	}
 }
 
+func TestRegexpParseFromStart(t *testing.T) {
+	p := spc.NewParserRegexp(`[0-9]+`)
+	sample := `the number starts from the 28th byte`
+	n, err := p.Parse(sample, 0)
+	if err == nil {
+		t.Fatalf("Parser regexp parse failed. Expected failure, got `%s`.", n.Content)
+	}
+}
+
 func TestNewParserTag(t *testing.T) {
 	p := spc.NewParserTag("string",
 		spc.NewParserChar(`"`),
@@ -169,12 +178,12 @@ func TestParseMath(t *testing.T) {
 	product := spc.NewParserTag("product")
 	value := spc.NewParserTag("value")
 	value.Add(spc.NewParserOr(
+		spc.NewParserRegexp(`[0-9]+`),
 		spc.NewParserTag("parenthesized-expression",
 			spc.NewParserChar(`(`),
 			expression,
 			spc.NewParserChar(`)`),
 		),
-		spc.NewParserRegexp(`[0-9]+`),
 	), false)
 	product.Add(value, false)
 	product.Add(spc.NewParserTag("sub-product",

@@ -6,7 +6,7 @@ import (
 )
 
 func TestParserString(t *testing.T) {
-	var p *spc.Parser
+	var p spc.Parser
 	var expected string
 
 	p = spc.NewParserChar(".")

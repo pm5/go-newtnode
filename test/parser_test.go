@@ -130,7 +130,8 @@ func TestTagParse(t *testing.T) {
 func TestTagAdd(t *testing.T) {
 	w := spc.NewParserRegexp(`[a-zA-Z]+`)
 	s := spc.NewParserTag("sentence")
-	s.Add(w, true)
+	s.Add(w, false)
+	s.Add(spc.NewParserTag("more-words", spc.NewParserChar(` `), w), true)
 	s.Add(spc.NewParserRegexp(`[\.!?]`), false)
 	n, err := s.Parse("Do you like green eggs and ham?", 0)
 	if err != nil {

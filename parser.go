@@ -3,11 +3,8 @@ package spc
 import (
 	"errors"
 	"fmt"
-	"github.com/tj/go-debug"
 	"regexp"
 )
-
-var d = debug.Debug("spc:parser")
 
 type Parser interface {
 	Parse(content string, index int) (node *Node, err error)

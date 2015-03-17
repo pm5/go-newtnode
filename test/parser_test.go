@@ -9,40 +9,40 @@ func TestParserString(t *testing.T) {
 	var p spc.Parser
 	var expected string
 
-	p = spc.NewParserChar(".")
+	p = spc.NewCharParser(".")
 	expected = "char `.`"
 	if p.String() != expected {
 		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
 	}
 
-	p = spc.NewParserRegexp(`[0-9]+`)
+	p = spc.NewRegexpParser(`[0-9]+`)
 	expected = "regexp `[0-9]+`"
 	if p.String() != expected {
 		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
 	}
 
-	p = spc.NewParserTag("number")
+	p = spc.NewTagParser("number")
 	expected = "tag `number`"
 	if p.String() != expected {
 		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
 	}
 
-	p = spc.NewParserOr(spc.NewParserChar("+"), spc.NewParserChar("-"))
+	p = spc.NewOrParser(spc.NewCharParser("+"), spc.NewCharParser("-"))
 	expected = "or"
 	if p.String() != expected {
 		t.Fatalf("Incorrect parser string. Expected `%s`, got `%s`.", expected, p)
 	}
 }
 
-func TestNewParserChar(t *testing.T) {
-	p := spc.NewParserChar(`"`)
+func TestNewCharParser(t *testing.T) {
+	p := spc.NewCharParser(`"`)
 	if p == nil {
 		t.Fatalf("Parser creation failed")
 	}
 }
 
 func TestCharParse(t *testing.T) {
-	p := spc.NewParserChar(`o`)
+	p := spc.NewCharParser(`o`)
 	n, err := p.Parse(`"hello"`, 5)
 	if err != nil {
 		t.Fatalf("Parse char failed: %s", err)
@@ -64,15 +64,15 @@ func TestCharParse(t *testing.T) {
 	}
 }
 
-func TestNewParserRegexp(t *testing.T) {
-	p := spc.NewParserRegexp("[a-zA-Z0-9_]")
+func TestNewRegexpParser(t *testing.T) {
+	p := spc.NewRegexpParser("[a-zA-Z0-9_]")
 	if p == nil {
 		t.Fatalf("Parser regexp creation failed")
 	}
 }
 
 func TestRegexpParse(t *testing.T) {
-	p := spc.NewParserRegexp(`[a-zA-Z\s]*`)
+	p := spc.NewRegexpParser(`[a-zA-Z\s]*`)
 	expected := `just what do you think youre doing`
 	n, err := p.Parse(expected+`, dave?`, 0)
 	if err != nil || n == nil {
@@ -87,7 +87,7 @@ func TestRegexpParse(t *testing.T) {
 }
 
 func TestRegexpParseFromStart(t *testing.T) {
-	p := spc.NewParserRegexp(`[0-9]+`)
+	p := spc.NewRegexpParser(`[0-9]+`)
 	sample := `the number starts from the 28th byte`
 	n, err := p.Parse(sample, 0)
 	if err == nil {
@@ -95,11 +95,11 @@ func TestRegexpParseFromStart(t *testing.T) {
 	}
 }
 
-func TestNewParserTag(t *testing.T) {
-	p := spc.NewParserTag("string",
-		spc.NewParserChar(`"`),
-		spc.NewParserRegexp(`[a-zA-Z\s\.]+`),
-		spc.NewParserChar(`"`),
+func TestNewTagParser(t *testing.T) {
+	p := spc.NewTagParser("string",
+		spc.NewCharParser(`"`),
+		spc.NewRegexpParser(`[a-zA-Z\s\.]+`),
+		spc.NewCharParser(`"`),
 	)
 	if p == nil {
 		t.Fatalf("Parser tag creation failed")
@@ -107,10 +107,10 @@ func TestNewParserTag(t *testing.T) {
 }
 
 func TestTagParse(t *testing.T) {
-	p := spc.NewParserTag("string",
-		spc.NewParserChar(`"`),
-		spc.NewParserRegexp(`[a-zA-Z\s\.,!?]+`),
-		spc.NewParserChar(`"`),
+	p := spc.NewTagParser("string",
+		spc.NewCharParser(`"`),
+		spc.NewRegexpParser(`[a-zA-Z\s\.,!?]+`),
+		spc.NewCharParser(`"`),
 	)
 	n, err := p.Parse("\"hello, world!\"", 0)
 	if err != nil {
@@ -128,11 +128,11 @@ func TestTagParse(t *testing.T) {
 }
 
 func TestTagAdd(t *testing.T) {
-	w := spc.NewParserRegexp(`[a-zA-Z]+`)
-	s := spc.NewParserTag("sentence")
+	w := spc.NewRegexpParser(`[a-zA-Z]+`)
+	s := spc.NewTagParser("sentence")
 	s.Add(w, false)
-	s.Add(spc.NewParserTag("more-words", spc.NewParserChar(` `), w), true)
-	s.Add(spc.NewParserRegexp(`[\.!?]`), false)
+	s.Add(spc.NewTagParser("more-words", spc.NewCharParser(` `), w), true)
+	s.Add(spc.NewRegexpParser(`[\.!?]`), false)
 	n, err := s.Parse("Do you like green eggs and ham?", 0)
 	if err != nil {
 		t.Fatalf("Parser add failed: %s", err)
@@ -142,10 +142,10 @@ func TestTagAdd(t *testing.T) {
 	}
 }
 
-func TestNewParserOr(t *testing.T) {
-	p := spc.NewParserOr(
-		spc.NewParserChar(`+`),
-		spc.NewParserChar(`-`),
+func TestNewOrParser(t *testing.T) {
+	p := spc.NewOrParser(
+		spc.NewCharParser(`+`),
+		spc.NewCharParser(`-`),
 	)
 	var n *spc.Node
 	var err error
@@ -175,37 +175,37 @@ func TestNewParserOr(t *testing.T) {
  *
  */
 func TestParseMath(t *testing.T) {
-	expression := spc.NewParserTag("expression")
-	product := spc.NewParserTag("product")
-	value := spc.NewParserTag("value")
-	value.Add(spc.NewParserOr(
-		spc.NewParserRegexp(`[0-9]+`),
-		spc.NewParserTag("parenthesized-expression",
-			spc.NewParserChar(`(`),
+	expression := spc.NewTagParser("expression")
+	product := spc.NewTagParser("product")
+	value := spc.NewTagParser("value")
+	value.Add(spc.NewOrParser(
+		spc.NewRegexpParser(`[0-9]+`),
+		spc.NewTagParser("parenthesized-expression",
+			spc.NewCharParser(`(`),
 			expression,
-			spc.NewParserChar(`)`),
+			spc.NewCharParser(`)`),
 		),
 	), false)
 	product.Add(value, false)
-	product.Add(spc.NewParserTag("sub-product",
-		spc.NewParserOr(
-			spc.NewParserChar(`*`),
-			spc.NewParserChar(`/`),
+	product.Add(spc.NewTagParser("sub-product",
+		spc.NewOrParser(
+			spc.NewCharParser(`*`),
+			spc.NewCharParser(`/`),
 		),
 		value,
 	), true)
 	expression.Add(product, false)
-	expression.Add(spc.NewParserTag("sub-expression",
-		spc.NewParserOr(
-			spc.NewParserChar(`+`),
-			spc.NewParserChar(`-`),
+	expression.Add(spc.NewTagParser("sub-expression",
+		spc.NewOrParser(
+			spc.NewCharParser(`+`),
+			spc.NewCharParser(`-`),
 		),
 		product,
 	), true)
-	maths := spc.NewParserTag("maths",
-		spc.NewParserRegexp(`^`),
+	maths := spc.NewTagParser("maths",
+		spc.NewRegexpParser(`^`),
 		expression,
-		spc.NewParserRegexp(`$`),
+		spc.NewRegexpParser(`$`),
 	)
 	n, err := maths.Parse("(4*2*11+2)-5", 0)
 	if err != nil {

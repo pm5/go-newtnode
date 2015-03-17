@@ -37,15 +37,15 @@ type OrParser struct {
 	a, b     Parser
 }
 
-func NewParserChar(content string) *CharParser {
+func NewCharParser(content string) *CharParser {
 	return &CharParser{Content: content}
 }
 
-func NewParserRegexp(pattern string) *RegexpParser {
+func NewRegexpParser(pattern string) *RegexpParser {
 	return &RegexpParser{Pattern: regexp.MustCompile("^" + pattern)}
 }
 
-func NewParserTag(name string, children ...Parser) *TagParser {
+func NewTagParser(name string, children ...Parser) *TagParser {
 	p := TagParser{Name: name}
 	for _, child := range children {
 		p.Add(child, false)
@@ -53,7 +53,7 @@ func NewParserTag(name string, children ...Parser) *TagParser {
 	return &p
 }
 
-func NewParserOr(a, b Parser) *OrParser {
+func NewOrParser(a, b Parser) *OrParser {
 	return &OrParser{a: a, b: b}
 }
 

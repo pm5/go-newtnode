@@ -1,8 +1,8 @@
 
-.PHONY: test watch
+.PHONY: test dev
 
 test:
 	cd test; DEBUG=* go test
 
-watch:
+dev:
 	watch 'cd test; go test'

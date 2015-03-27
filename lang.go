@@ -1,5 +1,10 @@
 package spc
 
-func NewLang(name, grammar string) *TagParser {
-	return NewTagParser(name)
+func newLangParser() (lang *TagParser) {
+	lang = NewTagParser("lang")
+	return
+}
+
+func NewLang(name, grammar string) (*TagParser, error) {
+	return NewTagParser(name), nil
 }

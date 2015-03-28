@@ -1,8 +1,11 @@
 
-.PHONY: test dev
+.PHONY: install-dep test dev
+
+install-dep:
+	go get github.com/pm5/wat
 
 test:
 	cd test; DEBUG=* go test
 
 dev:
-	watch 'cd test; go test'
+	wat 'make test' -- Makefile *.go
